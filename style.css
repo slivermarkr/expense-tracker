@@ -1,0 +1,32 @@
+* {
+    box-sizing: border-box;
+}
+
+.expense {
+    color: red
+}
+
+.profit {
+    color: green
+}
+
+form {
+    border: 1px solid black;
+    padding: 1rem;
+}
+
+.profit-expense-container {
+    display: flex;
+    gap: 2rem;
+}
+
+ul,
+button {
+    margin: 0;
+    padding: 0;
+}
+
+.transactionHistory li {
+    display: flex;
+    gap: .5rem;
+}
