@@ -2,6 +2,13 @@
     box-sizing: border-box;
 }
 
+body {
+    background-color: #333333;
+    color: #ffffff;
+    font-size: 18px;
+    font-family: 'Ubuntu Mono', monospace, sans-serif;
+}
+
 #entry {
     display: flex;
     flex-direction: row-reverse;
@@ -9,20 +16,28 @@
     gap: 2rem;
 }
 
-.balance-container {
+.balance-container,
+.section-title {
     font-weight: 900;
 }
 
+.balance {
+    color: #aa00ff;
+}
+
 .expense {
-    color: red
+    color: #ff4455
 }
 
 .profit {
-    color: green
+    color: #88ffaa
+}
+
+.transaction-name {
+    color: #ffffff;
 }
 
 form {
-    border: 1px solid black;
     padding: 1rem;
 }
 
@@ -46,4 +61,64 @@ button {
     display: inline-block;
     min-width: 3rem;
     min-height: 1rem;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+thead th {
+    padding: 1rem;
+}
+
+td,
+th {
+    border: solid 1px #aaaaaa;
+    padding: 1rem;
+    text-align: center;
+}
+
+.transactionHistory {
+    border-block: 2px solid #333333;
+    min-width: 400px;
+    max-height: 300px;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+.submitBtn {
+    padding: .6rem 1.2rem;
+    font-size: 18px;
+}
+
+button {
+    cursor: pointer;
+}
+
+input {
+    font-size: 19px;
+}
+
+.delete {
+    background: #303030;
+    font-weight: bold;
+    color: #181818;
+
+    padding: .2rem;
+    border: black 1px solid;
+    border-radius: 20%;
+}
+
+.delete:hover {
+    color: #ff4455
+}
+
+form p {
+    display: flex;
+    flex-direction: column;
+}
+
+fieldset {
+    border: 1px solid #aaaaaa;
 }

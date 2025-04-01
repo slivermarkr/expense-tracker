@@ -6,55 +6,62 @@
         return `
         <div class="info-container">
             <div class="balance-container">
-                <p>Balance: ₱<span class="balance">0.00</span></p>
+                <p>Balance: $<span class="balance">0.00</span></p>
             </div>
             <div class="profit-expense-container">
                 <div class="profit-container">
                     <p class="profit-heading">Profit: </p>
-                    <p class="profitWrap">₱<span class="profit">0.00</span></p>
+                    <p class="profitWrap">$<span class="profit">0.00</span></p>
                 </div>
                 <div class="expense-container">
                     <p class="expense-heading">Expense: </p>
-                    <p class="expenseWrap">-₱<span class="expense">0.00</span></p>
+                    <p class="expenseWrap">-$<span class="expense">0.00</span></p>
                 </div>
             </div>
             <div class="transactionHistory">
-                <p>Transaction History</p>
-                <ul class="transactions-list">
-                </ul>
+                <p class="section-title">Transaction History</p>
+                <table class="transactions-list">
+                    <thead>
+                        <tr><th>Name</th> <th>Amount</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
         <form class="myForm">
-            <legend>Add New Transaction</legend>
-            <p>
-                <label for="inputText">Name: </label>
-                <input type="text" placeholder="New Transaction" id="inputText" required>
-            </p>
-            <p>
-                <label for="inputAmount">Amount: </label>
-                <input type="text" placeholder="0.00" id="inputAmount" required>
-            </p>
-            <p>
-                <button class="submitBtn">Enter</button>
-            </p>
+            <fieldset>
+                <legend>Add New Transaction</legend>
+                <p>
+                    <label for="inputText">Name: </label>
+                    <input type="text" placeholder="New Transaction" id="inputText" required>
+                </p>
+                <p>
+                    <label for="inputAmount">Amount: </label>
+                    <input type="text" placeholder="0.00" id="inputAmount" required>
+                </p>
+                <p>
+                    <button class="submitBtn">Enter</button>
+                </p>
+            </fieldset>
+        <div class="img"</div>
         </form>
         `
     }
 
     const createTransactionItem = ({ name, amount, id }) => {
-        const list = document.createElement("li")
+        const list = document.createElement("tr")
         list.className = `transaction-list--item ${amount < 0 ? "expense" : "profit"}`;
         list.setAttribute("data-id", id)
         list.innerHTML = `
-            <p class="transaction-name">
-                ${name}
-            </p>
-            <p class="transaction-amount">
-                <span class="span-sign">
-                  ₱
-                </span>
-                <span class="span-amount">${amount.toFixed(2)}</span>
-            </p>
+                <th class="transaction-name">
+                    ${name}
+                </th>
+                <td class="transaction-amount">
+                    <span class="span-sign">
+                      $
+                    </span>
+                    <span class="span-amount">${amount.toFixed(2)}</span>
+                </td>
             <p><button class="delete">X</button></p>
         `
         return list;
@@ -91,7 +98,8 @@
         localStorage.setItem("expense-tracker", JSON.stringify(transactions));
         updateTransaction(transactions)
 
-        entry.querySelector(".transactions-list").appendChild(createTransactionItem(newTransaction));
+        console.log(entry.querySelector("tbody"))
+        entry.querySelector("tbody").appendChild(createTransactionItem(newTransaction));
     }
     const deleteTransaction = (id) => {
         const newArray = transactions.filter(transaction => transaction.id !== id);
@@ -145,7 +153,7 @@
 
     entry.addEventListener("click", e => {
         if (!e.target.classList.contains("delete")) return;
-        deleteTransaction(e.target.closest("li").dataset.id)
+        deleteTransaction(e.target.closest("tr").dataset.id)
     })
 
     // get data on local storage and update display on initial load.
@@ -153,7 +161,8 @@
         if (transactions.length > 0) {
             updateTransaction(transactions)
             for (const transaction of transactions) {
-                entry.querySelector(".transactions-list").appendChild(createTransactionItem(transaction))
+
+                entry.querySelector("tbody").appendChild(createTransactionItem(transaction))
             }
         }
     }
@@ -169,12 +178,13 @@
 
     entry.querySelector(".transactions-list").addEventListener("blur", (e) => {
         if (e.target.classList.contains("transaction-name")) {
-            const id = e.target.closest("li").dataset.id;
+            const id = e.target.closest("tr").dataset.id;
             editTransaction(id, "name", e.target.textContent);
         } else if (e.target.classList.contains("span-amount")) {
-            const id = e.target.closest("li").dataset.id;
+            const id = e.target.closest("tr").dataset.id;
             editTransaction(id, "amount", e.target.textContent);
         }
         e.target.contentEditable = false;
     }, true);
+
 })()
