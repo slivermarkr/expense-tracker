@@ -1,27 +1,28 @@
 (app => {
     const entry = document.querySelector("#entry");
+    let transactions = JSON.parse(localStorage.getItem("expense-tracker")) || [];
 
     const initHTML = () => {
         return `
-        <div class="balance-container">
-            <p>Balance: ₱<span class="balance">0.00</span></p>
-        </div>
-
-        <div class="profit-expense-container">
-            <div class="profit-container">
-                <p class="profit-heading">Profit: </p>
-                <p class="profitWrap">₱<span class="profit">0.00</span></p>
+        <div class="info-container">
+            <div class="balance-container">
+                <p>Balance: ₱<span class="balance">0.00</span></p>
             </div>
-            <div class="expense-container">
-                <p class="expense-heading">Expense: </p>
-                <p class="expenseWrap">-₱<span class="expense">0.00</span></p>
+            <div class="profit-expense-container">
+                <div class="profit-container">
+                    <p class="profit-heading">Profit: </p>
+                    <p class="profitWrap">₱<span class="profit">0.00</span></p>
+                </div>
+                <div class="expense-container">
+                    <p class="expense-heading">Expense: </p>
+                    <p class="expenseWrap">-₱<span class="expense">0.00</span></p>
+                </div>
             </div>
-
-        </div>
-        <div class="transactionHistory">
-            <p>Transaction History</p>
-            <ul class="transactions-list">
-            </ul>
+            <div class="transactionHistory">
+                <p>Transaction History</p>
+                <ul class="transactions-list">
+                </ul>
+            </div>
         </div>
         <form class="myForm">
             <legend>Add New Transaction</legend>
@@ -49,13 +50,15 @@
                 ${name}
             </p>
             <p class="transaction-amount">
-                ${amount > 0 ? "₱" + amount : "-₱" + Math.abs(amount)}
+                <span class="span-sign">
+                  ₱
+                </span>
+                <span class="span-amount">${amount.toFixed(2)}</span>
             </p>
             <p><button class="delete">X</button></p>
         `
         return list;
     }
-    let transactions = JSON.parse(localStorage.getItem("expense-tracker")) || [];
 
     const updateBalance = (balance) => {
         const balanceContainer = entry.querySelector(".balance");
@@ -72,18 +75,9 @@
     }
 
     const updateTransaction = (newTransactionsArray) => {
-        const profit = newTransactionsArray.reduce((acc, curr) => {
-            if (curr.amount && curr.amount > 0) {
-                acc += curr.amount
-            }
-            return acc;
-        }, 0);
-        const expense = newTransactionsArray.reduce((acc, curr) => {
-            if (curr.amount && curr.amount < 0) {
-                acc += curr.amount
-            }
-            return acc;
-        }, 0);
+        const profit = newTransactionsArray.reduce((acc, curr) => curr.amount > 0 ? acc + curr.amount : acc, 0);
+        const expense = newTransactionsArray.reduce((acc, curr) => curr.amount < 0 ? acc + curr.amount : acc, 0);
+
         const balance = profit + expense;
         updateProfit(profit);
         updateExpense(expense);
@@ -107,9 +101,23 @@
         entry.querySelector(`.transaction-list--item[data-id="${id}"]`).remove();
     }
 
+    const editTransaction = (id, type, content) => {
+        const targetIndex = transactions.findIndex(transaction => transaction.id === id);
+        const targetTransaction = transactions[targetIndex];
+        if (type === "name") {
+            targetTransaction.name = content;
+        } else if (type === "amount") {
+            targetTransaction.amount = Number(content);
+            const listItem = entry.querySelector(`.transaction-list--item[data-id="${id}"]`);
+            listItem.classList.toggle("expense", targetTransaction.amount < 0);
+            listItem.classList.toggle("profit", targetTransaction.amount >= 0);
+        }
+        localStorage.setItem("expense-tracker", JSON.stringify(transactions));
+        updateTransaction(transactions)
+    }
+
     const disableBtn = (isDisabled) => {
         const btn = entry.querySelector(".submitBtn");
-        console.log(isDisabled)
         if (isDisabled) {
             btn.disabled = true;
         } else {
@@ -141,10 +149,32 @@
     })
 
     // get data on local storage and update display on initial load.
-    window.addEventListener("load", () => {
-        updateTransaction(transactions)
-        for (const transaction of transactions) {
-            entry.querySelector(".transactions-list").appendChild(createTransactionItem(transaction))
+    const onLoad = () => {
+        if (transactions.length > 0) {
+            updateTransaction(transactions)
+            for (const transaction of transactions) {
+                entry.querySelector(".transactions-list").appendChild(createTransactionItem(transaction))
+            }
         }
+    }
+
+    onLoad();
+    entry.addEventListener("dblclick", e => {
+        if (e.target.classList.contains("transaction-name") || e.target.classList.contains("span-amount")) {
+            const target = e.target;
+            target.focus();
+            target.contentEditable = true;
+        };
     })
+
+    entry.querySelector(".transactions-list").addEventListener("blur", (e) => {
+        if (e.target.classList.contains("transaction-name")) {
+            const id = e.target.closest("li").dataset.id;
+            editTransaction(id, "name", e.target.textContent);
+        } else if (e.target.classList.contains("span-amount")) {
+            const id = e.target.closest("li").dataset.id;
+            editTransaction(id, "amount", e.target.textContent);
+        }
+        e.target.contentEditable = false;
+    }, true);
 })()

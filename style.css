@@ -2,6 +2,17 @@
     box-sizing: border-box;
 }
 
+#entry {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+    gap: 2rem;
+}
+
+.balance-container {
+    font-weight: 900;
+}
+
 .expense {
     color: red
 }
@@ -29,4 +40,10 @@ button {
 .transactionHistory li {
     display: flex;
     gap: .5rem;
+}
+
+.span-amount {
+    display: inline-block;
+    min-width: 3rem;
+    min-height: 1rem;
 }
